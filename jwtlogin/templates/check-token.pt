@@ -1,0 +1,9 @@
+<div metal:use-macro="master">
+  <div metal:fill-slot="content">
+
+    <div class="content">
+      Claims: ${ claims }
+    </div>
+
+  </div>
+</div>
