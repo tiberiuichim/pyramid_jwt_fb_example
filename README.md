@@ -7,8 +7,6 @@ authenticate against Pyramid apps.
 Getting Started
 ---------------
 
-- cd <directory containing this file>
-
 - Run ./install.sh
 
 You need to have virtualenv installed on your system. If you don't have it,
