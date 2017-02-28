@@ -35,8 +35,9 @@ def main(global_config, **settings):
 
     # Pyramid requires an authorization policy to be active.
     config.set_authorization_policy(CustomAuthorizationPolicy())
+    config.include('cornice')       # Enable JWT authentication.
     config.include('pyramid_jwt')       # Enable JWT authentication.
-    config.set_jwt_authentication_policy('secret')
+    config.set_jwt_authentication_policy(settings['jwt.private_key'])
 
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')

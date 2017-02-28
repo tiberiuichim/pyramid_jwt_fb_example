@@ -1,4 +1,5 @@
 from __future__ import print_function
+from cornice import Service
 from pyramid.view import view_config
 import jwt
 import requests
@@ -39,18 +40,52 @@ def login(request):
         }
 
 
+token_exchange = Service(name='token_exchange',
+                         path='/token-exchange',
+                         description='FB to JWT token exchange and login.',
+                         cors_origins=('*',),
+                         cors_max_age=3600
+                         )
+
+
+@token_exchange.post()
+def exchange(request):
+    d = request.json_body
+    user_id = d['user_id']
+    access_token = d['access_token']
+    user_id = fb_authenticate(user_id, access_token)
+    # request.response.headers['Access-Control-Allow-Origin'] = '*'
+    if user_id:
+        return {
+            'result': 'ok',
+            'token': request.create_jwt_token(user_id)
+        }
+    else:
+        return {
+            'result': 'error'
+        }
+
+
 @view_config(route_name='check-token',
              request_method='POST',
              renderer='templates/check-token.pt')
 def check_token(request):
     jwt_token = request.POST['jwt_token']
-    claims = jwt.decode(jwt_token, 'secret')
+    claims = jwt.decode(jwt_token,
+                        request.registry.settings['jwt.private_key'])
     return {'claims': claims}
 
 
-@view_config(route_name='something-protected',
-             request_method='GET',
-             permission='view-secret',
-             renderer='templates/protected.pt')
+secondpage = Service(name='secondpage',
+                     path='/second-page',
+                     description='Second view page',
+                     cors_origins=('*',),
+                     cors_max_age=3600
+                     )
+
+
+@secondpage.get()
 def something_protected(request):
-    return {}
+    return {
+        'text': 'hello world'
+    }
